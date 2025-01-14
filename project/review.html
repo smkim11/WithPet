@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>With Pet</title>
+    <style>
+        h2 a img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 150px;
+    height: auto;
+    z-index: 1;
+  }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #fff8ee;
+        }
+        h1 {
+            position: relative;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            height: 150px;
+        }
+        .form-group button {
+            background-color: #FFD27F;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #FFC966;
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 30px;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #FFD700;
+        }
+        .review-list {
+            margin-top: 20px;
+        }
+        .review-item {
+            position: relative;
+            background-color: #FFF9E5; /* 말풍선 배경색 */
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            max-width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .review-item:before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 20px;
+            margin-left: -10px;
+            border-width: 10px;
+            border-style: solid;
+            border-color: transparent transparent #FFF9E5 transparent; /* 삼각형 색상 */
+        }
+        .review-stars {
+            font-size: 24px;
+            color: #FFD700;
+        }
+        .review-item strong {
+            font-size: 18px;
+        }
+        a.back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        a.back-link:hover {
+            text-decoration: underline;
+        }
+        img.review-image {
+            max-width: 150px;
+            height: auto;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>
+        <a href="main.html">
+            <img src="image/logo1.png" alt="With Pet">
+        </a>
+    </h2>
+    <h1>리뷰 작성</h1>
+    <form id="review-form">
+        <div class="form-group">
+            <label for="place">가게 이름</label>
+            <input type="text" id="place" name="place" required>
+        </div>
+        <div class="form-group">
+            <label for="name">이름</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="rating">평점</label>
+            <div class="star-rating">
+                <input type="radio" id="star5" name="rating" value="5">
+                <label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4">
+                <label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3">
+                <label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2">
+                <label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1" required>
+                <label for="star1">★</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="review">리뷰</label>
+            <textarea id="review" name="review" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="image">사진 업로드</label>
+            <input type="file" id="image" name="image" accept="image/*">
+            <img id="preview" class="review-image" alt="미리보기 이미지" style="display:none;">
+        </div>
+        <div class="form-group">
+            <button type="submit">리뷰 제출</button>
+        </div>
+    </form>
+
+    <div class="review-list" id="review-list"></div>
+    <a href="javascript:void(0);" class="back-link" onclick="history.back(); history.back();">뒤로 가기</a>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // URL에서 'place' 파라미터를 가져와서 자동으로 입력 필드에 채우기
+        const placeInput = document.getElementById('place');
+        const placeName = urlParams.get('place');
+        if (placeName) {
+            placeInput.value = placeName;
+        }
+
+        // URL에서 'place' 파라미터 가져오기
+        const currentPlace = urlParams.get('place');
+
+        // 리뷰 데이터를 가져오고 필터링하여 표시
+        const reviewsJson = urlParams.get('reviews');
+        if (reviewsJson) {
+            const reviews = JSON.parse(decodeURIComponent(reviewsJson));
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            displayReviews(reviews, currentPlace);
+        } else {
+            const storedReviews = JSON.parse(localStorage.getItem('reviews')) || [];
+            displayReviews(storedReviews, currentPlace);
+        }
+
+        const imageInput = document.getElementById('image');
+        const preview = document.getElementById('preview');
+
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('review-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const place = document.getElementById('place').value;
+            const name = document.getElementById('name').value;
+            const rating = document.querySelector('input[name="rating"]:checked').value;
+            const review = document.getElementById('review').value;
+            const image = preview.src;
+
+            if (place && name && rating && review) {
+                const newReview = { place, name, rating, review, image };
+                addReviewToUrl(newReview);
+                document.getElementById('review-form').reset();
+                preview.style.display = 'none';
+            }
+        });
+    });
+
+    function addReviewToUrl(newReview) {
+        const storedReviews = JSON.parse(localStorage.getItem('reviews')) || [];
+        storedReviews.push(newReview);
+        localStorage.setItem('reviews', JSON.stringify(storedReviews));
+        const newUrl = `${window.location.pathname}?place=${newReview.place}&reviews=${encodeURIComponent(JSON.stringify(storedReviews))}`;
+        window.history.pushState({}, '', newUrl);
+        displayReviews(storedReviews, newReview.place);
+    }
+
+    function displayReviews(reviews, currentPlace) {
+        const reviewList = document.getElementById('review-list');
+        reviewList.innerHTML = '';
+
+        // place가 일치하는 리뷰만 필터링
+        const filteredReviews = reviews.filter((review) => review.place === currentPlace);
+
+        // 필터링된 리뷰만 표시
+        if (filteredReviews.length > 0) {
+            filteredReviews.forEach((review) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('review-item');
+                const stars = generateStarRating(review.rating);
+                reviewItem.innerHTML = `
+                    <strong>${review.name}</strong>  ${stars}<br>
+                    ${review.review}<br>
+                    ${review.image ? `<img src="${review.image}" class="review-image">` : ''}
+                `;
+                reviewList.appendChild(reviewItem);
+            });
+        } else {
+            reviewList.innerHTML = `<p>이 가게에 대한 리뷰가 없습니다.</p>`;
+        }
+    }
+
+    function generateStarRating(rating) {
+        let starHtml = '';
+        for (let i = 0; i < 5; i++) {
+            starHtml += i < rating ? '★' : '☆';
+        }
+        return `<span class="review-stars">${starHtml}</span>`;
+    }
+</script>
+</body>
+</html>

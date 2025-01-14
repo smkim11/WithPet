@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>With Pet</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<header>
+    <div class="container">
+        <h1>
+            <a href="main.html">
+                <img src="image/logo1.png" alt="With Pet">
+            </a>
+        </h1>
+        <nav>
+            <ul>
+                <li><a href="introduce.html">페이지 소개</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<section id="news-section" class="ui container">
+    <h2 class="ui header">최신 뉴스</h2>
+    <div class="ui relaxed divided list" id="news-list">
+
+    </div>
+    <button id="prev-btn" class="ui button">이전</button>
+    <button id="next-btn" class="ui button">다음</button>
+
+    <div class="start-button-container">
+        <button class="custom-btn btn"><a href="map.html">시작하기</a></button>
+    </div>
+</section>
+
+<script>
+    let currentIndex = 0; // 현재 표시 중인 뉴스의 인덱스
+    let newsData = []; // 가져온 뉴스 데이터를 저장
+    let autoSlideInterval = null; // 자동 슬라이드 Interval
+
+    async function fetchNews(query) {
+        const clientId = 'XHZ9ADZ2rrQWqLCtLrc6'; // 애플리케이션 클라이언트 아이디
+        const clientSecret = 'BEuGuzPjRB'; // 애플리케이션 클라이언트 시크릿
+        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        const encodedQuery = encodeURIComponent(query);
+        const apiUrl = `https://openapi.naver.com/v1/search/news?query=${encodedQuery}`;
+        const requestUrl = proxyUrl + apiUrl;
+
+        try {
+            const response = await fetch(requestUrl, {
+                method: 'GET',
+                headers: {
+                    'X-Naver-Client-Id': clientId,
+                    'X-Naver-Client-Secret': clientSecret
+                }
+            });
+
+            if (!response.ok) {
+                console.error('응답 상태 코드:', response.status);
+                console.error('응답 메시지:', response.statusText);
+                throw new Error('API 호출에 실패했습니다.');
+            }
+
+            const data = await response.json();
+            newsData = data.items; // 뉴스 데이터를 저장
+            if (newsData.length > 0) {
+                displayNews(currentIndex); // 첫 번째 뉴스 표시
+                startAutoSlide(); // 자동 슬라이드 시작
+            } else {
+                alert('검색 결과가 없습니다.');
+            }
+        } catch (error) {
+            console.error('Error 발생:', error);
+            alert('뉴스를 가져오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    function displayNews(index) {
+        const newsList = document.getElementById('news-list');
+        if (index >= 0 && index < newsData.length) {
+            const item = newsData[index];
+            newsList.innerHTML = `
+                <div class="item">
+                    <div class="content">
+                        <a class="header" href="${item.link}" target="_blank">${item.title}</a>
+                        <div class="description">${item.description}</div>
+                        <div><strong>작성일:</strong> ${new Date(item.pubDate).toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    function nextNews() {
+        if (currentIndex < newsData.length - 1) {
+            currentIndex++;
+        } else {
+            currentIndex = 0; // 마지막 뉴스 이후 첫 번째 뉴스로 이동
+        }
+        displayNews(currentIndex);
+    }
+
+    function prevNews() {
+        if (currentIndex > 0) {
+            currentIndex--;
+        } else {
+            currentIndex = newsData.length - 1; // 첫 번째 뉴스 이전 마지막 뉴스로 이동
+        }
+        displayNews(currentIndex);
+    }
+
+    function startAutoSlide() {
+        stopAutoSlide(); // 기존 슬라이드 중지
+        autoSlideInterval = setInterval(nextNews, 5000); // 5초마다 다음 뉴스
+    }
+
+    function stopAutoSlide() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = null;
+        }
+    }
+
+    // 버튼 이벤트 핸들러
+    document.getElementById('prev-btn').addEventListener('click', () => {
+        stopAutoSlide(); // 버튼 클릭 시 자동 슬라이드 중지
+        prevNews();
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        stopAutoSlide(); // 버튼 클릭 시 자동 슬라이드 중지
+        nextNews();
+    });
+
+    // 뉴스 검색 실행
+    fetchNews('반려견');
+</script>
+
+
+
+</body>
+
+</html>

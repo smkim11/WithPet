@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>With Pet</title>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=o5gi6azzqk&submodules=geocoder"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/map.css" />
+
+</head>
+<body>
+<div id="wrap" class="section">
+    <h1>
+        <a href="main.html">
+            <img src="image/logo1.png" alt="With Pet">
+        </a>
+    </h1>
+
+    <div class="search">
+        <input id="address" type="text" placeholder="검색할 주소" />
+        <input id="submit" type="button" value="주소 검색" />
+        <input id="park-submit" type="button" value="공원 검색" />
+    </div>
+    <div id="map"></div>
+    <div class="button-container">
+        <div class="submit-form" data-query="양식">
+            <figure>
+                <img src="image/004-hamburger.png" alt="양식">
+                <figcaption>양식</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="한식">
+            <figure>
+                <img src="image/006-bibimbap.png" alt="한식">
+                <figcaption>한식</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="일식">
+            <figure>
+                <img src="image/005-sushi.png" alt="일식">
+                <figcaption>일식</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="중화요리">
+            <figure>
+                <img src="image/007-buns-1.png" alt="중화요리">
+                <figcaption>중식</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="카페">
+            <figure>
+                <img src="image/002-coffee-1.png" alt="카페">
+                <figcaption>카페</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="분식">
+            <figure>
+                <img src="image/004-tteokbokki.png" alt="분식">
+                <figcaption>분식</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="해산물">
+            <figure>
+                <img src="image/005-lobster.png" alt="해산물">
+                <figcaption>해산물</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="베트남">
+            <figure>
+                <img src="image/002-noodle.png" alt="베트남">
+                <figcaption>베트남</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="태국">
+            <figure>
+                <img src="image/001-thai-food.png" alt="태국">
+                <figcaption>태국</figcaption>
+            </figure>
+        </div>
+        <div class="submit-form" data-query="멕시코">
+            <figure>
+                <img src="image/003-taco.png" alt="멕시코">
+                <figcaption>멕시코</figcaption>
+            </figure>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 사용자의 현재 위치로 지도를 설정하는 함수
+    function setMapToCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const userLocation = new naver.maps.LatLng(
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+
+                    map.setCenter(userLocation);
+                    map.setZoom(15);
+
+                    const marker = new naver.maps.Marker({
+                        position: userLocation,
+                        map: map,
+                        title: '현재 위치'
+                    });
+
+                    const infoWindow = new naver.maps.InfoWindow({
+                        content: '<div style="padding:10px;">현재 위치</div>'
+                    });
+
+                    infoWindow.open(map, marker);
+                },
+                function (error) {
+                    console.error("Geolocation 오류:", error);
+                    alert("현재 위치를 가져올 수 없습니다.");
+                }
+            );
+        } else {
+            alert("Geolocation을 지원하지 않는 브라우저입니다.");
+        }
+    }
+
+    var map = new naver.maps.Map("map", {
+        center: new naver.maps.LatLng(37.5666805, 126.9784147), // 기본 위치 (서울)
+        zoom: 15,
+        mapTypeControl: true
+    });
+
+    setMapToCurrentLocation(); // 페이지 로드 시 현재 위치로 지도 설정
+
+    map.setCursor('pointer');
+
+    // 평균 평점을 계산하는 함수
+function calculateAverageRating(place) {
+    const reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+    const placeReviews = reviews.filter(review => review.place === place);
+
+    if (placeReviews.length === 0) return '평점 없음';
+
+    const totalRating = placeReviews.reduce((sum, review) => sum + parseInt(review.rating, 10), 0);
+    const averageRating = (totalRating / placeReviews.length).toFixed(1);
+    return `평점: ${averageRating}`;
+}
+
+// 마커에 마우스를 올렸을 때 간단한 정보 표시
+function addMarkerWithEvents(item, wgs84) {
+    const marker = new naver.maps.Marker({
+        position: wgs84,
+        map: map,
+        title: item.title
+    });
+
+    // 마커 클릭 시 나오는 상세 정보창에 평점 추가
+    const averageRatingText = calculateAverageRating(item.title);
+    const detailedInfoWindow = new naver.maps.InfoWindow({
+        content: `
+            <div style="padding:10px;">
+                <strong>${item.title}</strong><br/>
+                <span>${item.category}</span><br/>
+                <span>${item.address}</span><br/>
+                <span>${averageRatingText}</span><br/>
+                <a href="${item.link}" target="_blank">상세정보</a><br/>
+                <a href="review.html?place=${encodeURIComponent(item.title)}">리뷰</a>
+            </div>`
+    });
+
+    naver.maps.Event.addListener(marker, 'click', function () {
+        detailedInfoWindow.open(map, marker);
+    });
+
+    return marker;
+}
+
+// 검색 결과를 화면에 표시하는 함수
+function displayResults(data) {
+    const results = data.items;
+    let output = '';
+
+    results.forEach((item, index) => {
+        const mapx = parseFloat(item.mapx.substring(0, 3) + '.' + item.mapx.substring(3));
+        const mapy = parseFloat(item.mapy.substring(0, 2) + '.' + item.mapy.substring(2));
+        const wgs84 = new naver.maps.LatLng(mapy, mapx);
+
+        const marker = addMarkerWithEvents(item, wgs84); // 마커 추가
+
+        // 테이블에 검색 결과 표시
+        output += `<tr><td><a href="${item.link}" target="_blank">${index + 1}. ${item.title}</a></td></tr>`;
+    });
+
+    $('#local-results').html(output);
+}
+
+ async function searchParksNearby() {
+    const address = $('#address').val();
+    const query = `${address} 공원`; // Add park category
+    const encodedAddress = encodeURIComponent(query);
+    const apiUrl = `https://openapi.naver.com/v1/search/local?query=${encodedAddress}&display=100`;
+
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/http://localhost:3001'; // Use proxy server
+    const requestUrl = proxyUrl + apiUrl;
+
+    const clientId = 'XHZ9ADZ2rrQWqLCtLrc6'; // Naver Client ID
+    const clientSecret = 'BEuGuzPjRB'; // Naver Client Secret
+
+    try {
+        const response = await fetch(requestUrl, {
+            method: 'GET',
+            headers: {
+                'X-Naver-Client-Id': clientId,
+                'X-Naver-Client-Secret': clientSecret
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('API 호출에 실패했습니다.');
+        }
+
+        const data = await response.json();
+
+        // Filter parks from the response
+        const parks = data.items.filter(item => item.category.includes('공원'));
+
+        if (parks.length > 0) {
+            // Center the map on the first park's location
+            const firstPark = parks[0];
+            const mapx = parseFloat(firstPark.mapx.substring(0, 3) + '.' + firstPark.mapx.substring(3));
+            const mapy = parseFloat(firstPark.mapy.substring(0, 2) + '.' + firstPark.mapy.substring(2));
+            const newLocation = new naver.maps.LatLng(mapy, mapx);
+
+            // Set the map center and zoom level
+            map.setCenter(newLocation);
+            map.setZoom(15); // Adjust zoom level as needed
+
+            // Create markers for all parks
+            parks.forEach((item, index) => {
+                const mapx = parseFloat(item.mapx.substring(0, 3) + '.' + item.mapx.substring(3));
+                const mapy = parseFloat(item.mapy.substring(0, 2) + '.' + item.mapy.substring(2));
+                const newLocation = new naver.maps.LatLng(mapy, mapx);
+
+                // Create a custom park marker
+                const parkMarker = new naver.maps.Marker({
+                    position: newLocation,
+                    map: map,
+                    title: item.title,
+                    icon: {
+                        content: '<div class="park-marker">🌳</div>',
+                        size: new naver.maps.Size(30, 30),
+                        anchor: new naver.maps.Point(15, 30),
+                    }
+                });
+
+                // Create an info window for the park
+                const infoWindow = new naver.maps.InfoWindow({
+                    content: `<div style="padding:10px;">
+                                  <strong>${item.title}</strong><br />
+                                  <span>${item.category}</span><br />
+                                  <span>${item.roadAddress || item.address}</span><br />
+                                  <a href="review.html?place=${encodeURIComponent(item.title)}">리뷰</a>
+                              </div>`
+                });
+
+                // Open the info window for the first park immediately
+                if (index === 0) {
+                    infoWindow.open(map, parkMarker);
+                }
+
+                // Open the info window on marker click
+                naver.maps.Event.addListener(parkMarker, 'click', function () {
+                    infoWindow.open(map, parkMarker);
+                });
+            });
+        } else {
+            alert('주변 공원이 없습니다.');
+        }
+    } catch (error) {
+        console.error('Error 발생:', error);
+        alert('검색 중 오류가 발생했습니다.');
+    }
+}
+
+
+
+    const categoryIcons = {
+    '양식': '🍔',  // Western food
+    '한식': '🍚',  // Korean food
+    '일식': '🍣',  // Japanese food
+    '중화요리': '🥟',  // Chinese food
+    '카페': '☕',  // Cafe
+    '분식': '🍙',  // Snacks
+    '해산물': '🦞',  // Seafood
+    '베트남': '🍜',  // Vietnamese food
+    '태국': '🍛',  // Thai food
+    '멕시코': '🌮'  // Mexican food
+};
+
+async function searchAddressToCoordinate(query, category = null) {
+    const clientId = 'XHZ9ADZ2rrQWqLCtLrc6';
+    const clientSecret = 'BEuGuzPjRB';
+    const encodedQuery = encodeURIComponent(query);
+    const apiUrl = `https://openapi.naver.com/v1/search/local?query=${encodedQuery}&display=100`;
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+    const requestUrl = proxyUrl + apiUrl;
+
+    try {
+        const response = await fetch(requestUrl, {
+            method: 'GET',
+            headers: {
+                'X-Naver-Client-Id': clientId,
+                'X-Naver-Client-Secret': clientSecret
+            }
+        });
+
+        if (!response.ok) throw new Error('API 호출에 실패했습니다.');
+
+        const data = await response.json();
+
+        if (data.items.length > 0) {
+            const firstResult = data.items[0];
+            const mapx = parseFloat(firstResult.mapx.substring(0, 3) + '.' + firstResult.mapx.substring(3));
+            const mapy = parseFloat(firstResult.mapy.substring(0, 2) + '.' + firstResult.mapy.substring(2));
+            const newLocation = new naver.maps.LatLng(mapy, mapx);
+
+            map.setCenter(newLocation);
+
+            // Add category-based markers for each result
+            data.items.forEach(item => {
+                const itemMapx = parseFloat(item.mapx.substring(0, 3) + '.' + item.mapx.substring(3));
+                const itemMapy = parseFloat(item.mapy.substring(0, 2) + '.' + item.mapy.substring(2));
+                const itemLocation = new naver.maps.LatLng(itemMapy, itemMapx);
+
+                // Use category-specific icon (emoji)
+                const iconText = categoryIcons[category] || '🍴'; // Default icon
+
+                const marker = new naver.maps.Marker({
+                    position: itemLocation,
+                    map: map,
+                    title: item.title,
+                    icon: {
+                        content: `<div class="category-marker">${iconText}</div>`,
+                        size: new naver.maps.Size(30, 30),
+                        anchor: new naver.maps.Point(15, 30)
+                    }
+                });
+
+                // Calculate average rating using the provided function
+                const averageRating = calculateAverageRating(item.title);
+
+                // Info window content with details and calculated rating
+                const infoWindowContent = `
+                    <div style="padding:10px;">
+                        <strong>${item.title}</strong><br />
+                        <span>${item.category}</span><br />
+                        <span>${item.roadAddress || item.address}</span><br />
+                        <span>${averageRating}</span><br />
+                        <a href="${item.link}" target="_blank">상세정보</a><br/>
+                        <a href="review.html?place=${encodeURIComponent(item.title)}">리뷰</a>
+                    </div>`;
+
+                const infoWindow = new naver.maps.InfoWindow({
+                    content: infoWindowContent
+                });
+
+                // Open info window for the first marker automatically
+                if (item === data.items[0]) {
+                    infoWindow.open(map, marker);
+                }
+
+                // Open info window on marker click
+                naver.maps.Event.addListener(marker, 'click', function () {
+                    infoWindow.open(map, marker);
+                });
+            });
+        } else {
+            alert('검색 결과가 없습니다.');
+        }
+    } catch (error) {
+        console.error('Error 발생:', error);
+        alert('검색 중 오류가 발생했습니다.');
+    }
+}
+
+
+
+
+    // 사용자가 Enter를 눌렀을 때 검색 실행
+    $('#address').on('keydown', function (e) {
+    if (e.which === 13) {
+        const address = $('#address').val();
+        const query = `${address} 애견동반식당`;
+        searchAddressToCoordinate(query);
+    }
+});
+
+
+    $('#submit').on('click', function () {
+    const address = $('#address').val();
+    const query = `${address} 애견동반식당`; // Add pet-friendly keyword
+    searchAddressToCoordinate(query);
+});
+
+    // 음식 카테고리 버튼 클릭 이벤트
+    $('.submit-form').on('click', function () {
+        const address = $('#address').val();
+        const category = $(this).data('query'); // Get the category from data attribute
+        const query = `${address} 애견동반 ${category}`;
+        searchAddressToCoordinate(query,category);
+    });
+    $('#park-submit').on('click', function () {
+        searchParksNearby();
+    });
+</script>
+
+</body>
+</html>
