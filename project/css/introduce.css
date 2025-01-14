@@ -1,0 +1,140 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
+:root {
+    --main-color: #ffc043;
+    --sub-color1: #ffb452;
+    --sub-color2: #649550;
+}
+
+body {
+    background-color: #fff8ee;
+}
+
+h2 {
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 80px;
+}
+
+h4 {
+    font-size: 26px;
+}
+
+h1 a img {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 120px;
+    height: auto;
+    z-index: 1;
+}
+
+.wrapper {
+    width: 90%;
+    max-width: 600px;
+    height: auto;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 7px;
+    box-shadow: 0px 0px 5px 2px black;
+    margin: 5% auto;
+    padding: 20px;
+}
+
+#main article img {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+}
+
+#main article {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+article .textLayout {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    width: 100%;
+    background: #fbfbfb;
+    border-radius: 7px;
+    box-shadow: 0px 0px 5px 2px black;
+    margin-top: 20px;
+}
+
+article .textLayout .text {
+    text-align: center;
+}
+
+.accent {
+    color: var(--sub-color1);
+}
+
+.accent2 {
+    color: var(--sub-color2);
+}
+
+article h4 {
+    margin-bottom: 20px;
+    line-height: 1.5em;
+}
+
+article p {
+    margin-bottom: 15px;
+    line-height: 1.6em;
+}
+
+article p strong {
+    font-size: large;
+    line-height: 1.5em;
+}
+
+/* 반응형 디자인 추가 */
+@media (min-width: 768px) {
+
+    .wrapper {
+        width: 70%;
+    }
+
+    #main article {
+        flex-direction: row;
+    }
+
+    article .textLayout {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    article .textLayout .text {
+        text-align: left;
+        margin-right: 20px;
+    }
+
+    article .textLayout img {
+        max-width: 300px;
+    }
+}
+
+@media (min-width: 1024px) {
+
+    .wrapper {
+        width: 50%;
+    }
+
+    article .textLayout {
+        padding: 40px 30px;
+    }
+}
