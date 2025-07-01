@@ -13,15 +13,24 @@
 		<table border="1">
 			<tr>
 				<th>아이디</th>
-				<td><input type="text" id="id" name="id"><button type="button" id="findId">중복확인</button></td>
+				<td>
+					<input type="text" id="id" name="id"><button type="button" id="findId">중복확인</button>
+					<span style="color:red" id="idMsg">
+				</td>
 			</tr>
 			<tr>
 				<th>비밀번호</th>
-				<td><input type="password" id="pw" name="pw"></td>
+				<td>
+					<input type="password" id="pw" name="pw">
+					<span style="color:red" id="pwMsg" ></span>
+				</td>
 			</tr>
 			<tr>
 				<th>비밀번호 확인</th>
-				<td><input type="password" id="pw2" name="pw2"></td>
+				<td>
+					<input type="password" id="pw2" name="pw2">
+					<span style="color:red" id="pw2Msg">
+				</td>
 			</tr>
 			<tr>
 				<th>이름</th>
@@ -46,14 +55,26 @@
 			url:'/findSameId/'+$('#id').val(),
 			success:function(data){
 				if(data == true){
-					alert('사용가능 아이디');
+					$('#idMsg').text('사용가능 아이디.');
 				}else{
-					alert('사용불가 아이디');
+					$('#idMsg').text('사용불가 아이디.');
 					$('#id').val('');
 				}
 			}
 		});
+	});
 	
+	$('#pw').blur(function(){
+		if($('#pw').val().length<8){
+			$('#pwMsg').text('비밀번호는 8자 이상입니다.');
+			$('#pw').val('');
+		}
+	});
+	$('#pw2').blur(function(){
+		if($('#pw').val() !== $('#pw2').val()){
+			$('#pw2Msg').text('비밀번호가 일치하지 않습니다.');
+			$('#pw2').val('');
+		}
 	});
 </script>
 </html>
