@@ -1,6 +1,10 @@
 package com.example.withpet.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -47,6 +51,21 @@ public class UserController {
 		return "로그인 실패";
 	}
 	
+	// 세션에 저장한 로그인정보
+	@GetMapping("/session")
+	public ResponseEntity<Map<String, Object>> getSession(HttpSession session) {
+	    Map<String, Object> sessionData = new HashMap<>();
+	    if (session.getAttribute("userId") != null) {
+	        sessionData.put("userId", session.getAttribute("userId"));
+	        sessionData.put("id", session.getAttribute("id"));
+	        sessionData.put("name", session.getAttribute("name"));
+	        sessionData.put("role", session.getAttribute("role"));
+	        return ResponseEntity.ok(sessionData);
+	    } else {
+	        return ResponseEntity.status(401).body(null); // 로그인 안 된 경우
+	    }
+	}
+
 	// 마이페이지
 	@GetMapping("/myPage/{userId}")
 	public UserEntity myPage(@PathVariable int userId) {
