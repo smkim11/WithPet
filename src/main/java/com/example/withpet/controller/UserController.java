@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4000", allowCredentials = "true")
 public class UserController {
 	@Autowired UserService userService;
 	
@@ -38,32 +39,41 @@ public class UserController {
 		userService.signup(user);
 	}
 	
-	// 로그인
 	@PostMapping("/login")
 	public String login(HttpSession httpSession, @RequestBody User user) {
-		if(userService.login(user)) {
-			httpSession.setAttribute("userId", user.getUserId());
-			httpSession.setAttribute("id", user.getId());
-			httpSession.setAttribute("name", user.getName());
-			httpSession.setAttribute("role", user.getRole());
-			return "로그인 성공";
-		}
-		return "로그인 실패";
+	    UserEntity loggedInUser = userService.login(user);
+	    log.info("로그인 user role: {}", loggedInUser.getRole());
+	    if(loggedInUser != null) {
+	        httpSession.setAttribute("userId", loggedInUser.getUserId());
+	        httpSession.setAttribute("id", loggedInUser.getId());
+	        httpSession.setAttribute("name", loggedInUser.getName());
+	        httpSession.setAttribute("role", loggedInUser.getRole());
+	        return "로그인 성공";
+	    }
+	    return "로그인 실패";
 	}
+
 	
 	// 세션에 저장한 로그인정보
 	@GetMapping("/session")
-	public ResponseEntity<Map<String, Object>> getSession(HttpSession session) {
-	    Map<String, Object> sessionData = new HashMap<>();
-	    if (session.getAttribute("userId") != null) {
-	        sessionData.put("userId", session.getAttribute("userId"));
-	        sessionData.put("id", session.getAttribute("id"));
-	        sessionData.put("name", session.getAttribute("name"));
-	        sessionData.put("role", session.getAttribute("role"));
-	        return ResponseEntity.ok(sessionData);
-	    } else {
-	        return ResponseEntity.status(401).body(null); // 로그인 안 된 경우
-	    }
+	public Map<String, Object> session(HttpSession session) {
+	    Map<String, Object> result = new HashMap<>();
+	    System.out.println("세션 ID: " + session.getId());
+	    System.out.println("userId: " + session.getAttribute("userId"));
+	    System.out.println("name: " + session.getAttribute("name"));
+	    result.put("userId", session.getAttribute("userId"));
+	    result.put("id", session.getAttribute("id"));
+	    result.put("name", session.getAttribute("name"));
+	    result.put("role", session.getAttribute("role"));
+	    return result;
+	}
+
+	
+	// 로그아웃
+	@PostMapping("/logout")
+	public ResponseEntity<String> logout(HttpSession httpSession) {
+		httpSession.invalidate();
+		return new ResponseEntity<String>("로그아웃",HttpStatus.OK);
 	}
 
 	// 마이페이지

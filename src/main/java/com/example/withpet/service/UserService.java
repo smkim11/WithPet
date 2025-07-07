@@ -34,12 +34,10 @@ public class UserService {
 	}
 	
 	// 로그인
-	public boolean login(@RequestBody User user) {
-		if(userRepository.findByIdAndPw(user.getId(), user.getPw())==null) {
-			return false;
-		}
-		return true;
+	public UserEntity login(User user) {
+	    return userRepository.findByIdAndPw(user.getId(), user.getPw());
 	}
+
 	
 	// 마이페이지
 	public UserEntity myPage(int userId) {
