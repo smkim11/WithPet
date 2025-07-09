@@ -39,9 +39,14 @@ public class UserService {
 	}
 
 	
-	// 마이페이지
+	// 마이페이지(유저 정보)
 	public UserEntity myPage(int userId) {
 		return userRepository.findById(userId).orElse(null);
+	}
+	
+	// 마이페이지(반려견 정보)
+	public PetEntity myPagePet(int userId) {
+		return petRepository.findByUserEntity(userRepository.findById(userId).orElse(null));
 	}
 	
 	// 개인정보 수정

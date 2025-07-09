@@ -58,7 +58,6 @@ public class UserController {
 	@GetMapping("/session")
 	public Map<String, Object> session(HttpSession session) {
 	    Map<String, Object> result = new HashMap<>();
-	    System.out.println("세션 ID: " + session.getId());
 	    System.out.println("userId: " + session.getAttribute("userId"));
 	    System.out.println("name: " + session.getAttribute("name"));
 	    result.put("userId", session.getAttribute("userId"));
@@ -76,10 +75,13 @@ public class UserController {
 		return new ResponseEntity<String>("로그아웃",HttpStatus.OK);
 	}
 
-	// 마이페이지
+	// 마이페이지(사용자와 반려견 정보)
 	@GetMapping("/myPage/{userId}")
-	public UserEntity myPage(@PathVariable int userId) {
-		return userService.myPage(userId);
+	public HashMap<String,Object> myPage(@PathVariable int userId) {
+		HashMap<String,Object> map = new HashMap<String,Object>();
+		map.put("user", userService.myPage(userId));
+		map.put("pet", userService.myPagePet(userId));
+		return map;
 	}
 	
 	// 개인정보 수정
