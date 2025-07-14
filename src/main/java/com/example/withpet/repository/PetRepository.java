@@ -7,5 +7,4 @@ import com.example.withpet.entity.UserEntity;
 
 public interface PetRepository extends JpaRepository<PetEntity, Integer>{
 	PetEntity findByUserEntity(UserEntity userEntity);
-
 }
