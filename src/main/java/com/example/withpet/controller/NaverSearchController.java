@@ -19,7 +19,6 @@ public class NaverSearchController {
 	@GetMapping("/search/{query}")
     public ResponseEntity<String> search(@PathVariable String query) {
         try {
-        	query="애견동반"+query;
             String result = naverService.searchLocal(query);
             return ResponseEntity.ok(result);
         } catch (IOException e) {
