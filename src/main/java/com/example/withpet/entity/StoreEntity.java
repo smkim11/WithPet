@@ -28,4 +28,6 @@ public class StoreEntity {
 	@Column(name = "address")
 	private String address;
 	
+	@Column(name="link")
+	private String link;
 }
