@@ -30,4 +30,8 @@ public class ReviewEntity {
 	@ManyToOne 
 	@JoinColumn(name = "user_id")
 	private UserEntity userEntity;
+	
+	@ManyToOne
+	@JoinColumn(name="store_id")
+	private StoreEntity storeEntity;
 }

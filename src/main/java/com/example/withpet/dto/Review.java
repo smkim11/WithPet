@@ -10,6 +10,7 @@ public class Review {
 	private String rating;
 	private String comment;
 	private int userId;
+	private int storeId;
 	
 	public ReviewEntity toEntity() {
 		ReviewEntity entity = new ReviewEntity();
