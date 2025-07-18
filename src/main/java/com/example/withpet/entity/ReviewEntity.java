@@ -1,5 +1,7 @@
 package com.example.withpet.entity;
 
+import org.hibernate.annotations.CurrentTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +28,13 @@ public class ReviewEntity {
 	
 	@Column(name = "comment")
 	private String comment;
+	
+	@Column(name = "file")
+	private String file;
+	
+	@Column(name = "create_date")
+	@CurrentTimestamp
+	private String createDate;
 	
 	@ManyToOne 
 	@JoinColumn(name = "user_id")
