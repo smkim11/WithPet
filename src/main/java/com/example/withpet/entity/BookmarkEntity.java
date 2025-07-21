@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,11 +28,13 @@ public class BookmarkEntity {
 	@CurrentTimestamp
 	private String createDate;
 	
-	@Column(name = "user_id")
-	private int userEntity;
+	@ManyToOne 
+	@JoinColumn(name = "user_id")
+	private UserEntity userEntity;
 	
-	@Column(name = "store_id")
-	private int storeEntity;
+	@ManyToOne 
+	@JoinColumn(name = "store_id")
+	private StoreEntity storeEntity;
 	
 	
 }
