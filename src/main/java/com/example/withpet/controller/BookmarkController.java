@@ -1,8 +1,12 @@
 package com.example.withpet.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.withpet.dto.Bookmark;
@@ -20,5 +24,15 @@ public class BookmarkController {
 		bookmarkService.insertBookmark(bookmark);
 	}
 	
+	// 가게 번호 검색
+	@GetMapping("/selectStoreId")
+	public int selectStoreId(@RequestParam String title) {
+		return bookmarkService.selectStoreId(title);
+	}
 	
+	// 사용자별 즐겨찾기한 가게번호
+	@GetMapping("/selectStoreIdByUserId")
+	public List<Integer> selectStoreIdByUserId(@RequestParam int userId){
+		return bookmarkService.selectStoreIdByUserId(userId);
+	}
 }

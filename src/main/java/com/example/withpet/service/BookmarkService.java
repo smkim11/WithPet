@@ -1,5 +1,7 @@
 package com.example.withpet.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,11 @@ public class BookmarkService {
 		return false;
 	}
 	
+	// 가게 번호 찾기
+	public int selectStoreId(String title) {
+		return bookmarkRepository.selectStoreId(title);
+	}
+	
 	// 즐겨찾기 등록
 	public void insertBookmark(Bookmark bookmark) {
 		BookmarkEntity bookmarkEntity = new BookmarkEntity();
@@ -35,5 +42,10 @@ public class BookmarkService {
 		bookmarkEntity.setStoreEntity(storeEntity);
 		
 		bookmarkRepository.save(bookmarkEntity);
+	}
+	
+	// 사용자별 즐겨찾기 가게번호
+	public List<Integer> selectStoreIdByUserId(int userId){
+		return bookmarkRepository.selectStoreIdByUserId(userId);
 	}
 }
