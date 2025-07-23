@@ -1,8 +1,10 @@
 package com.example.withpet.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.example.withpet.dto.Bookmark;
@@ -47,5 +49,10 @@ public class BookmarkService {
 	// 사용자별 즐겨찾기 가게번호
 	public List<Integer> selectStoreIdByUserId(int userId){
 		return bookmarkRepository.selectStoreIdByUserId(userId);
+	}
+	
+	// 사용자별 즐겨찾기 목록
+	public List<Map<String,Object>> selectBookmarkByUserId(int userId){
+		return bookmarkRepository.selectBookmarkByUserId(userId);
 	}
 }

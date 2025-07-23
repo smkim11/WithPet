@@ -9,7 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.withpet.entity.BookmarkEntity;
 
 public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Integer>{
-	 
+	// 사용자별 즐겨찾기 목록
+	@Query(nativeQuery = true,
+			value= "SELECT s.title, s.category, s.address "
+			+"FROM bookmark b INNER JOIN store s ON b.store_id = s.store_id "
+			+"INNER JOIN user u ON u.user_id = b.user_id "
+			+"WHERE u.user_id=:userId")
+	List<Map<String,Object>> selectBookmarkByUserId(int userId); 
+	
 	// 가게이름에 맞는 가게 번호
 	@Query(nativeQuery = true,
 	value= "select store_id storeId "
