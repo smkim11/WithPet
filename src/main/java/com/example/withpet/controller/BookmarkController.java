@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,5 +44,11 @@ public class BookmarkController {
 	@GetMapping("/bookmarkList")
 	public List<Map<String,Object>> selectBookmarkByUserId(@RequestParam int userId){
 		return bookmarkService.selectBookmarkByUserId(userId);
+	}
+	
+	// 즐겨찾기 삭제
+	@DeleteMapping("/deleteBookmark")
+	public void deleteBookmark(@RequestBody Bookmark bookmark) {
+		bookmarkService.deleteBookmark(bookmark);
 	}
 }

@@ -55,4 +55,11 @@ public class BookmarkService {
 	public List<Map<String,Object>> selectBookmarkByUserId(int userId){
 		return bookmarkRepository.selectBookmarkByUserId(userId);
 	}
+	
+	// 즐겨찾기 삭제
+	public void deleteBookmark(Bookmark bookmark) {
+		BookmarkEntity bookmarkEntity = new BookmarkEntity();
+		bookmarkEntity= bookmarkRepository.findByUserIdAndStoreId(bookmark.getUserId(),bookmark.getStoreId());
+		bookmarkRepository.delete(bookmarkEntity);
+	}
 }
