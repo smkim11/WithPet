@@ -56,8 +56,5 @@ public class UserService {
 		userEntity.setId(user.getId());
 		userEntity.setBirth(user.getBirth());
 		userEntity.setEmail(user.getEmail());
-		
-		PetEntity petEntity = petRepository.findByUserEntity(userEntity);
-		petEntity.setPetName(user.getPetName());
 	}
 }
