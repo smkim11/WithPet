@@ -69,4 +69,9 @@ public class StoreService {
 	public List<Map<String,Object>> selectReviewByTitle(String title){
 		return reviewRepository.selectReviewByTitle(title);
 	}
+	
+	// 가게별 리뷰에 작성된 별점 평균, 참여 인원수
+	public List<Map<String,Object>> selectRatingAvg(int storeId) {
+		return storeRepository.selectRatingAvg(storeId);
+	}
 }

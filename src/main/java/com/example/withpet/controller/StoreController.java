@@ -38,4 +38,10 @@ public class StoreController {
 	public List<Map<String,Object>> selectReviewByTitle(@RequestParam String title){
 		return storeService.selectReviewByTitle(title);
 	}
+	
+	// 가게별 리뷰에 작성된 별점 평균, 참여 인원수
+	@GetMapping("/selectRatingAvg")
+	public List<Map<String,Object>> selectRatingAvg(@RequestParam int storeId) {
+		return storeService.selectRatingAvg(storeId);
+	}
 }
