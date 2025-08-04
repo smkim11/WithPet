@@ -17,4 +17,18 @@ public interface StoreRepository extends JpaRepository<StoreEntity, Integer>{
 			+ "from review "
 			+ "where store_id=:storeId")
 	List<Map<String,Object>> selectRatingAvg(int storeId);
+	
+	// 즐겨찾기 많이된 순위
+	@Query(nativeQuery = true,
+			value= "SELECT s.title, ROW_NUMBER() OVER(ORDER BY COUNT(*) DESC) AS ranking "
+					+ "FROM bookmark b INNER JOIN store s ON b.store_id = s.store_id "
+					+ "GROUP BY s.title LIMIT 0,10")
+	List<Map<String,Object>> selectStoreRankByBookmark();
+	
+	// 리뷰많은 순위
+	@Query(nativeQuery = true,
+			value= "SELECT s.title, ROW_NUMBER() OVER(ORDER BY COUNT(*) DESC) AS ranking "
+					+ "FROM review r INNER JOIN store s ON r.store_id = s.store_id "
+					+ "GROUP BY s.title LIMIT 0,10")
+	List<Map<String,Object>> selectStoreRankByReview();
 }

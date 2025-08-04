@@ -74,4 +74,13 @@ public class StoreService {
 	public List<Map<String,Object>> selectRatingAvg(int storeId) {
 		return storeRepository.selectRatingAvg(storeId);
 	}
+	
+	// 즐겨찾기 많이된 순위
+	public List<Map<String,Object>> selectStoreRankByBookmark(){
+		return storeRepository.selectStoreRankByBookmark();
+	}
+	// 리뷰 많은 순위
+	public List<Map<String,Object>> selectStoreRankByReview(){
+		return storeRepository.selectStoreRankByReview();
+	}
 }

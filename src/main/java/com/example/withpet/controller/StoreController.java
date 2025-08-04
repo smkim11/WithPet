@@ -44,4 +44,16 @@ public class StoreController {
 	public List<Map<String,Object>> selectRatingAvg(@RequestParam int storeId) {
 		return storeService.selectRatingAvg(storeId);
 	}
+	
+	// 즐겨찾기 많은 순위
+	@GetMapping("/selectStoreRankByBookmark")
+	public List<Map<String,Object>> selectStoreRankByBookmark() {
+		return storeService.selectStoreRankByBookmark();
+	}
+	
+	// 리뷰 많은 순위
+	@GetMapping("/selectStoreRankByReview")
+	public List<Map<String,Object>> selectStoreRankByReview() {
+		return storeService.selectStoreRankByReview();
+	}
 }
