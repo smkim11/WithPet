@@ -20,7 +20,7 @@ public interface BookmarkRepository extends JpaRepository<BookmarkEntity, Intege
 	
 	// 사용자별 즐겨찾기 목록
 	@Query(nativeQuery = true,
-			value= "SELECT s.title, s.category, s.address, s.link "
+			value= "SELECT s.title, s.category, s.address, s.link, s.store_id storeId "
 			+"FROM bookmark b INNER JOIN store s ON b.store_id = s.store_id "
 			+"INNER JOIN user u ON u.user_id = b.user_id "
 			+"WHERE u.user_id=:userId")
