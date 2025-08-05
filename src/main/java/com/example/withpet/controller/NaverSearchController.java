@@ -16,6 +16,7 @@ import com.example.withpet.service.NaverLocalSearchService;
 public class NaverSearchController {
 	@Autowired NaverLocalSearchService naverService;
 	
+	// 네이버 지역 검색 API
 	@GetMapping("/search/{query}")
     public ResponseEntity<String> search(@PathVariable String query) {
         try {
@@ -25,4 +26,15 @@ public class NaverSearchController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("검색 실패");
         }
     }
+	
+	// 네이버 클라우드 플랫폼 directions 5 길찾기
+	@GetMapping("/directions")
+	public ResponseEntity<String> getDirections(
+	    @RequestParam String start,
+	    @RequestParam String goal
+	) throws IOException {
+	    String route = naverService.getDrivingRoute(start, goal);
+	    return ResponseEntity.ok(route);
+	}
+
 }
